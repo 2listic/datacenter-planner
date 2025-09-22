@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { updateCoolerParticles } from './coolerParticles.js'
 import { updateRackParticles } from './rackParticles.js'
 import { addObjectToScene, deleteObject } from './3dObjects.js'
@@ -215,3 +216,20 @@ remove_model.addEventListener('click', deleteObject, false)
 
 let export_scene = document.getElementById('export_scene')
 export_scene.addEventListener('click', exportSceneToJson, false)
+
+export function loadUserOBJ(objContent) {
+  const loader = new OBJLoader();
+  try {
+    // Use .parse() to read from a string, not .load()
+    const object = loader.parse(objContent);
+
+    object.name = 'user_uploaded_model';
+    models.push(object);
+    scene.add(object);
+    console.log('Successfully parsed and loaded user OBJ model.');
+
+  } catch (error) {
+    console.error('An error happened while parsing the OBJ model:', error);
+    alert('Failed to parse the 3D model. Please ensure it is a valid OBJ file.');
+  }
+}
