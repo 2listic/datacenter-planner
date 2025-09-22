@@ -2,7 +2,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import paper from 'paper'
 import { createGrid } from './2d/floor2d.js'
 import { setupDxfUpload } from './2d/dxfLoader.js'
-import { init3D, camera, renderer } from './3d/scene3d.js'
+import { init3D, camera, renderer, loadUserOBJ } from './3d/scene3d.js'
 import { convertPathsTo3D } from './3d/pathsTo3d.js'
 // import parseDXF from 'dxf-parser'
 
@@ -35,12 +35,19 @@ fileInput.addEventListener('change', (event) => {
     const reader = new FileReader()
     reader.onload = (e) => {
       const content = e.target.result
-      if (file.name.toLowerCase().endsWith('.dxf')) {
+      const fileName = file.name.toLowerCase()
+
+      if (fileName.endsWith('.dxf')) {
         parseAndLoadDXF(content)
-      } else if (file.name.toLowerCase().endsWith('.dwg')) {
-        alert('DWG files are not supported yet. Please upload a DXF file.')
+      } else if (fileName.endsWith('.obj')) {
+        if (container3D.style.display === 'none') {
+            switchButton.click()
+        }
+        loadUserOBJ(content)
+      } else if (fileName.endsWith('.dwg')) {
+        alert('DWG files are not supported. Please upload a DXF or OBJ file.')
       } else {
-        alert('Please select a DXF or DWG file.')
+        alert('Please select a DXF or OBJ file.')
       }
     }
     reader.readAsText(file)
