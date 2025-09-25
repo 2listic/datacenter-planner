@@ -1,7 +1,14 @@
 import * as THREE from 'three'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { createCoolerParticles } from './coolerParticles.js'
-import { createRackParticles } from './rackParticles.js'
+import {
+  createCoolerParticles,
+  particleSystems as coolerParticleSystems,
+} from './coolerParticles.js'
+import {
+  createRackParticles,
+  particleSystems as rackParticleSystems,
+} from './rackParticles.js'
+import { addAttractor, addAttractorToRack, attractors } from './attractors.js'
 import { scene, models, raycasterMouse, transformControls } from './scene3d.js'
 
 /**
@@ -10,7 +17,10 @@ import { scene, models, raycasterMouse, transformControls } from './scene3d.js'
  * @param {string} model 
  */
 export function addObjectToScene(model) {
-  console.log(model)
+  if (model === 'Attractor') {
+    addAttractor()
+    return
+  }
   // Use a material that responds to light
   let material_obj = new THREE.MeshStandardMaterial({
     color: 0x6e6e6e, // Gray color
@@ -40,6 +50,7 @@ export function addObjectToScene(model) {
         object.scale.setY(1.1)
         setRackPosition(object)
         createRackParticles(object)
+        addAttractorToRack(object)
         break
     }
     scene.add(object)
@@ -68,12 +79,12 @@ function aux_mesh_name(object, material, name) {
  */
 export function deleteObject() {
   const intersects = raycasterMouse.intersectObjects(models, true)
-  console.log(intersects[0].object)
 
   // Check if there are any intersected objects
   if (intersects.length > 0) {
     // Get the parent object that was added to the models array
     let draggableObject = intersects[0].object
+    console.log(draggableObject)
 
     // Traverse up the hierarchy to find the root parent that was added to models
     while (draggableObject.parent && !models.includes(draggableObject)) {
@@ -89,6 +100,48 @@ export function deleteObject() {
       const index = models.indexOf(draggableObject)
       if (index > -1) {
         models.splice(index, 1)
+        console.log('Object removed from models array')
+      }
+
+      // If the object is a cooler, remove also the associated particle system
+      if (draggableObject?.name === 'cooler') {
+        const coolerParticleSystemIndex = coolerParticleSystems.findIndex(
+          (ps) => ps.cooler === draggableObject
+        )
+        if (coolerParticleSystemIndex > -1) {
+          coolerParticleSystems.splice(coolerParticleSystemIndex, 1)
+          console.log('Particle system removed from coolerParticleSystems array')
+        }
+      }
+
+      // If the object is a rack, remove also the associated particle system and attractor
+      if (draggableObject?.name === 'rack') {
+        const rackParticleSystemIndex = rackParticleSystems.findIndex(
+          (ps) => ps.rack === draggableObject
+        )
+        if (rackParticleSystemIndex > -1) {
+          rackParticleSystems.splice(rackParticleSystemIndex, 1)
+          console.log('Particle system removed from rackParticleSystems array')
+        }
+
+        const attractorIndex = attractors.findIndex(
+          (a) => a.parent = draggableObject
+        )
+        if (attractorIndex > -1) {
+          attractors.splice(attractorIndex, 1)
+          console.log('Attractor removed from attractors array')
+        }
+      }
+
+      // If object is a spare attractor, remove it from rectangles
+      if (draggableObject?.name === 'attractor') {
+        const attractorIndex = attractors.findIndex(
+          (a) => a.mesh === draggableObject
+        )
+        if (attractorIndex > -1) {
+          attractors.splice(attractorIndex, 1)
+          console.log('Attractor removed from attractors array')
+        }
       }
 
       // Detach transform controls and reset the draggableObject variable
