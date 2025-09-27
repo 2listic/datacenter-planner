@@ -20,29 +20,31 @@
         />
         <button id="uploadDxfBtn" class="btn btn-secondary">Upload DXF</button>
       </div>
+      <div id="info2D" class="info-box">
+        <div id="shortcutsHeader2D" class="shortcuts-toggle">
+          <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
+        </div>
+        <div id="shortcutsContent2D" class="shortcuts-content">
+          <ul>
+            <li><strong>Ctrl + Z:</strong> Undo last action</li>
+          </ul>
+        </div>
+      </div>
       <canvas id="canvas2D"></canvas>
     </div>
 
     <!-- start with container3D hidden -->
     <div id="container3D" style="display: none">
       <!-- info, menu and canvas are fixed so Three.js correctly calculates canvas' dimensions -->
-      <div id="info">
-        <div id="shortcutsHeader" class="shortcuts-toggle">
-          <h3>Keyboard Shortcuts <span id="shortcutsArrow">▼</span></h3>
+      <div id="info3D" class="info-box">
+        <div id="shortcutsHeader3D" class="shortcuts-toggle">
+          <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
         </div>
-        <div id="shortcutsContent" class="shortcuts-content">
+        <div id="shortcutsContent3D" class="shortcuts-content">
           <ul>
-            <li>
-              <strong>T - Translate (Move):</strong> Switches to Translate mode
-              on X/Z axes.
-            </li>
-            <li>
-              <strong>R - Rotate:</strong> Switches to Rotate mode on Y axis.
-            </li>
-            <li>
-              <strong>Y - Translate Vertically:</strong> Switches to Translate
-              mode on Y axis only.
-            </li>
+            <li><strong>T - Translate (Move):</strong> Switches to Translate mode on X/Z axes.</li>
+            <li><strong>R - Rotate:</strong> Switches to Rotate mode on Y axis.</li>
+            <li><strong>Y - Translate Vertically:</strong> Switches to Translate mode on Y axis only.</li>
           </ul>
         </div>
       </div>
