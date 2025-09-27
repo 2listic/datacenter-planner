@@ -28,13 +28,14 @@ switchButton.addEventListener('click', () => {
 })
 
 // Handle keyboard shortcuts toggle
-const shortcutsHeader = document.getElementById('shortcutsHeader')
-const shortcutsContent = document.getElementById('shortcutsContent')
-const shortcutsArrow = document.getElementById('shortcutsArrow')
+function setupShortcutsToggle(headerId, contentId) {
+  const shortcutsHeader = document.getElementById(headerId)
+  const shortcutsContent = document.getElementById(contentId)
+  const shortcutsArrow = document.getElementsByClassName('shortcutsArrow')
 
-let shortcutsExpanded = false // Start expanded
+  let shortcutsExpanded = false // Start expanded
 
-shortcutsHeader.addEventListener('click', () => {
+  shortcutsHeader.addEventListener('click', () => {
   shortcutsExpanded = !shortcutsExpanded
 
   if (shortcutsExpanded) {
@@ -44,7 +45,11 @@ shortcutsHeader.addEventListener('click', () => {
     shortcutsContent.classList.add('collapsed')
     shortcutsArrow.textContent = '▶'
   }
-})
+  })
+}
+
+setupShortcutsToggle('shortcutsHeader2D', 'shortcutsContent2D')
+setupShortcutsToggle('shortcutsHeader3D', 'shortcutsContent3D')
 
 // Handle window resizing
 window.addEventListener('resize', () => {

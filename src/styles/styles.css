@@ -60,10 +60,10 @@ html {
   margin: 0;
 }
 
-#info {
+.info-box {
   position: absolute;
   top: 30px;
-  left: calc(20vw + 20px);
+  left: 20px;
   max-width: 350px;
   background: rgba(0, 0, 0, 0.8);
   color: #ffffff;
@@ -73,7 +73,16 @@ html {
   font-size: 14px;
   line-height: 1.4;
   z-index: 1000;
-  pointer-events: auto; /* Allow clicking */
+}
+
+#info2D {
+  top: 80px;
+  left: 15px;
+}
+
+#info3D {
+  top: 20px;
+  left: 380px;
 }
 
 .shortcuts-toggle {
@@ -92,7 +101,7 @@ html {
   flex-grow: 1;
 }
 
-#shortcutsArrow {
+.shortcutsArrow {
   font-size: 12px;
   transition: transform 0.3s ease;
   margin-left: 10px;
