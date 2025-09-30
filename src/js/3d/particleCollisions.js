@@ -1,6 +1,5 @@
 import * as THREE from 'three'
-import { particleSystems as rackParticleSystems } from './rackParticles.js'
-import { particleSystems as coolerParticleSystems } from './coolerParticles.js'
+import { rackParticleSystems, coolerParticleSystems } from './particleSystem.js'
 
 /**
  * checkInterParticleCollisions checks for collisions between particles emitted from racks (red)
@@ -20,8 +19,8 @@ export function checkInterParticleCollisions() {
 }
 
 function checkCollisionsBetweenSystems(rackData, coolerData) {
-  const rackGeometry = rackData.geometry
-  const coolerGeometry = coolerData.geometry
+  const rackGeometry = rackData.system.geometry
+  const coolerGeometry = coolerData.system.geometry
 
   const rackWorldPositions = rackGeometry.attributes.worldPosition.array
   const coolerWorldPositions = coolerGeometry.attributes.worldPosition.array
@@ -78,8 +77,8 @@ function handleCollision(
   coolerParticleIndex
 ) {
   // Make both particles disappear immediately by setting their lifetime to max
-  const rackGeometry = rackData.geometry
-  const coolerGeometry = coolerData.geometry
+  const rackGeometry = rackData.system.geometry
+  const coolerGeometry = coolerData.system.geometry
 
   const rackMaxLifetimes = rackGeometry.attributes.maxLifetime.array
   const rackColors = rackGeometry.attributes.color.array

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { particleSystems as coolerParticleSystems } from './coolerParticles.js'
+import { coolerParticleSystems } from './particleSystem.js'
 
 /**
  * Array storing all attractors in the scene.
@@ -80,8 +80,8 @@ export function attractCoolerParticles() {
   // Calculate force from each attractor
   // attractors.forEach((attractor, index) => {
   coolerParticleSystems.forEach((coolerData) => {
-    const coolerGeometry = coolerData.geometry
-    const coolerObject = coolerData.cooler
+    const coolerGeometry = coolerData.system.geometry
+    const coolerObject = coolerData.object
     const coolerParticlesWorldPositions =
       coolerGeometry.attributes.worldPosition.array
     const coolerParticlesVelocities = coolerGeometry.attributes.velocity.array

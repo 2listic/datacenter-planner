@@ -2,12 +2,10 @@ import * as THREE from 'three'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
 import {
   createCoolerParticles,
-  particleSystems as coolerParticleSystems,
-} from './coolerParticles.js'
-import {
+  coolerParticleSystems,
   createRackParticles,
-  particleSystems as rackParticleSystems,
-} from './rackParticles.js'
+  rackParticleSystems,
+} from './particleSystem.js'
 import { addAttractorToRack, attractors } from './attractors.js'
 import { scene, models, raycasterMouse, transformControls } from './scene3d.js'
 
