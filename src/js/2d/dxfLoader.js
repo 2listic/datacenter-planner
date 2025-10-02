@@ -1,5 +1,5 @@
 import paper from 'paper'
-import { ensureGridVisible } from './floor2d.js'
+import { ensureGridVisible } from './core2d.js'
 
 /**
  * loadDxfFile loads and parses a DXF file, scales its entities to fit the canvas,
