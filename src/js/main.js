@@ -53,8 +53,9 @@ setupShortcutsToggle('shortcutsHeader3D', 'shortcutsContent3D')
 
 // Handle window resizing
 window.addEventListener('resize', () => {
-  console.log('resizing...')
-  paper.view.viewSize = new paper.Size(window.innerWidth, window.innerHeight)
+  // console.log('resizing...')
+  // paper.view.viewSize = new paper.Size(window.innerWidth, window.innerHeight) # replaced by resize att in html
+  createGrid()
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)

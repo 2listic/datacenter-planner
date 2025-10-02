@@ -21,6 +21,13 @@
         <button id="uploadDxfBtn" class="btn btn-secondary">Upload DXF</button>
       </div>
       <div id="info2D" class="info-box">
+        <button
+          class="close-info"
+          onclick="this.parentElement.style.display='none'"
+          aria-label="Close"
+        >
+          ×
+        </button>
         <div id="shortcutsHeader2D" class="shortcuts-toggle">
           <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
         </div>
@@ -30,13 +37,20 @@
           </ul>
         </div>
       </div>
-      <canvas id="canvas2D"></canvas>
+      <canvas id="canvas2D" resize hidpi="off"></canvas>
     </div>
 
     <!-- start with container3D hidden -->
     <div id="container3D" style="display: none">
       <!-- info, menu and canvas are fixed so Three.js correctly calculates canvas' dimensions -->
       <div id="info3D" class="info-box">
+        <button
+          class="close-info"
+          onclick="this.parentElement.style.display='none'"
+          aria-label="Close"
+        >
+          ×
+        </button>
         <div id="shortcutsHeader3D" class="shortcuts-toggle">
           <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
         </div>
