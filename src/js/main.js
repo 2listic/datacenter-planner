@@ -24,6 +24,8 @@ switchButton.addEventListener('click', () => {
     container2D.style.display = 'block'
     container3D.style.display = 'none'
     switchButton.textContent = 'Switch to 3D'
+    // fixes when window is small that part of floorplan is cutted then turn to 3D the window is big again then turn to 2d the canvas is striched not resized
+    paper.view.viewSize = new paper.Size(window.innerWidth, window.innerHeight)
   }
 })
 
@@ -55,7 +57,6 @@ setupShortcutsToggle('shortcutsHeader3D', 'shortcutsContent3D')
 window.addEventListener('resize', () => {
   // console.log('resizing...')
   // paper.view.viewSize = new paper.Size(window.innerWidth, window.innerHeight) # replaced by resize att in html
-  createGrid()
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
