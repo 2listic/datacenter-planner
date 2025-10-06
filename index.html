@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Datacenter Planner</title>
+    <link rel="icon" href="/datacenter-planner/assets/dualistic-logo-BpgR_K1O.png" />
+    <script type="module" crossorigin src="/datacenter-planner/assets/index-DpldtQqJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/datacenter-planner/assets/index-CDpt4qnq.css">
+  </head>
+
+  <body>
+    <button id="switchMode" class="btn btn-primary">Switch to 3D</button>
+    <div id="container2D">
+      <div id="uploadControls">
+        <input
+          type="file"
+          id="dxfFileInput"
+          accept=".dxf"
+          style="display: none"
+        />
+        <button id="uploadDxfBtn" class="btn btn-secondary">Upload DXF</button>
+      </div>
+      <div id="info2D" class="info-box">
+        <div id="shortcutsHeader2D" class="shortcuts-toggle">
+          <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
+        </div>
+        <div id="shortcutsContent2D" class="shortcuts-content">
+          <ul>
+            <li><strong>Ctrl + Z:</strong> Undo last action</li>
+          </ul>
+        </div>
+      </div>
+      <canvas id="canvas2D"></canvas>
+    </div>
+
+    <!-- start with container3D hidden -->
+    <div id="container3D" style="display: none">
+      <!-- info, menu and canvas are fixed so Three.js correctly calculates canvas' dimensions -->
+      <div id="info3D" class="info-box">
+        <div id="shortcutsHeader3D" class="shortcuts-toggle">
+          <h3>Keyboard Shortcuts <span class="shortcutsArrow">▼</span></h3>
+        </div>
+        <div id="shortcutsContent3D" class="shortcuts-content">
+          <ul>
+            <li>
+              <strong>T - Translate (Move):</strong> Switches to Translate mode
+              on X/Z axes.
+            </li>
+            <li>
+              <strong>R - Rotate:</strong> Switches to Rotate mode on Y axis.
+            </li>
+            <li>
+              <strong>Y - Translate Vertically:</strong> Switches to Translate
+              mode on Y axis only.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="menuBar">
+        <!-- Dropdown with Thumbnails -->
+        <div class="mb-3">
+          <p>Add new model</p>
+          <div class="dropdown" data-alt="none">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Choose a model
+            </button>
+            <ul
+              class="dropdown-menu w-100"
+              aria-labelledby="dropdownMenuButton"
+              style="max-height: 300px; overflow-y: auto"
+            >
+              <!-- Cooler -->
+              <li class="dropdown-item" onclick="selectImage('Cooler')">
+                <img
+                  src="cooler.jpg"
+                  alt="cooler"
+                  class="img-thumbnail"
+                  style="width: 50px; height: 50px"
+                />
+                <span>Cooler</span>
+              </li>
+              <!-- Chair -->
+              <li class="dropdown-item" onclick="selectImage('Chair')">
+                <img
+                  src="chair.jpg"
+                  alt="chair"
+                  class="img-thumbnail"
+                  style="width: 50px; height: 50px"
+                />
+                <span>Chair</span>
+              </li>
+              <!-- Table -->
+              <li class="dropdown-item" onclick="selectImage('Table')">
+                <img
+                  src="table.jpg"
+                  alt="table"
+                  class="img-thumbnail"
+                  style="width: 50px; height: 50px"
+                />
+                <span>Table</span>
+              </li>
+              <!-- Rack -->
+              <li class="dropdown-item" onclick="selectImage('Rack')">
+                <img
+                  src="rack.jpg"
+                  alt="rack"
+                  class="img-thumbnail"
+                  style="width: 50px; height: 50px"
+                />
+                <span>Rack</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <button id="add_model" type="button" class="btn btn-primary mb-3">
+          Add Model
+        </button>
+        <hr />
+        <p id="selectedModel">No selected model</p>
+        <button id="delete_model" type="button" class="btn btn-danger mb-3">
+          Delete Selected
+        </button>
+        <hr />
+        <button id="export_scene" type="button" class="btn btn-secondary w-101">
+          Export 3D
+        </button>
+      </div>
+      <canvas id="canvas3D"></canvas>
+    </div>
+  </body>
+</html>
