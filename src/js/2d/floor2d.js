@@ -201,69 +201,96 @@ function deleteLine(line) {
   line.remove()
 }
 
-paper.view.onMouseDown = function (event) {
-  const snappedPoint = snapToGrid(event.point) // Snap starting point to the grid
 
-  if (event.event.button === 2) {
-    // Perform a hit test to find the line that was right-clicked
-    const hitResult = paper.project.hitTest(event.point, {
-      segments: true,
-      stroke: true,
-      fill: true,
-      tolerance: 5,
-    })
+// 1. Centralize the configuration for easier future changes.
+const drawingConfig = {
+    line: {
+        strokeColor: 'black',
+        strokeWidth: 5,
+    },
+    text: {
+        fillColor: 'black',
+        fontSize: 16,
+    },
+    hitTest: {
+        segments: true,
+        stroke: true,
+        fill: true,
+        tolerance: 5,
+    },
+};
 
-    if (hitResult && hitResult.item.className === 'Path') {
-      selectedLine = hitResult.item
-      createContextMenu(event.event) // Pass the mouse event to position the menu
-      return
-    }
-  }
+/**
+ * 2. Extract the repeated logic for creating a new line and its text.
+ * @param {paper.Point} startPoint - The starting point for the new line.
+ */
+function startNewLine(startPoint) {
+    // Create the Path
+    currentPath = new paper.Path({
+        ...drawingConfig.line, // Use the centralized configuration
+        segments: [startPoint],
+    });
 
-  // If not a right-click or no line is clicked, remove the context menu
-  if (contextMenu) {
-    contextMenu.remove()
-    contextMenu = null
-  }
-
-  if (selectedVertex) {
-    // Start a new line from the selected vertex
-    if (currentPath) {
-      currentPath.removeSegment(1)
-    }
-    currentPath = new paper.Path()
-    currentPath.strokeColor = 'black'
-    currentPath.strokeWidth = 5
-    currentPath.add(snapToGrid(selectedVertex.position)) // Snap to grid
-
-    // Initialize length text
+    // Create the length text
     currentText = new paper.PointText({
-      point: selectedVertex.position,
-      content: '',
-      fillColor: 'black',
-      fontSize: 16,
-    })
-
-    // Deselect the vertex
-    selectedVertex = null
-  } else if (selectedLine) {
-    // Code to handle selected line (not the focus here)
-  } else {
-    // Start a new line normally
-    currentPath = new paper.Path()
-    currentPath.strokeColor = 'black'
-    currentPath.strokeWidth = 5
-    currentPath.add(snappedPoint) // Start at the snapped grid point
-
-    // Initialize length text
-    currentText = new paper.PointText({
-      point: snappedPoint,
-      content: '',
-      fillColor: 'black',
-      fontSize: 16,
-    })
-  }
+        ...drawingConfig.text, // Use the centralized configuration
+        point: startPoint,
+        content: '',
+    });
 }
+
+/**
+ * 3. Separate the right-click logic into its own function.
+ * @param {paper.ToolEvent} event - The mouse event.
+ * @returns {boolean} - Returns true if the event was handled, otherwise false.
+ */
+function handleRightClick(event) {
+    const hitResult = paper.project.hitTest(event.point, drawingConfig.hitTest);
+
+    if (hitResult?.item.className === 'Path') {
+        selectedLine = hitResult.item;
+        createContextMenu(event.event);
+        return true; // The right-click found a target and was handled
+    }
+    return false; // Nothing was done
+}
+
+/**
+ * 4. The main function is now cleaner and acts as an "orchestrator".
+ */
+paper.view.onMouseDown = function (event) {
+    // Handle right-clicks (Guard Clause)
+    if (event.event.button === 2) {
+        if (handleRightClick(event)) {
+            return; // If the right-click did something, stop execution here.
+        }
+    }
+
+    // If we get here, it's a left-click or a right-click that did nothing.
+    // First, clean up any previous state (the context menu)
+    if (contextMenu) {
+        contextMenu.remove();
+        contextMenu = null;
+    }
+    
+    // If a line is selected, deselect it to start drawing.
+    // (You can add other logic here if needed)
+    if (selectedLine) {
+        selectedLine = null;
+    }
+
+    // Determine the starting point for the new line
+    let startPoint;
+    if (selectedVertex) {
+        startPoint = snapToGrid(selectedVertex.position);
+        selectedVertex = null; // Clear the vertex selection
+    } else {
+        startPoint = snapToGrid(event.point);
+    }
+
+    // Finally, call the function to create the new line
+    startNewLine(startPoint);
+};
 
 paper.view.onMouseDrag = function (event) {
   if (currentPath) {
