@@ -36,15 +36,15 @@ function setupShortcutsToggle(headerId, contentId) {
   let shortcutsExpanded = false // Start expanded
 
   shortcutsHeader.addEventListener('click', () => {
-  shortcutsExpanded = !shortcutsExpanded
+    shortcutsExpanded = !shortcutsExpanded
 
-  if (shortcutsExpanded) {
-    shortcutsContent.classList.remove('collapsed')
-    shortcutsArrow.textContent = '▼'
-  } else {
-    shortcutsContent.classList.add('collapsed')
-    shortcutsArrow.textContent = '▶'
-  }
+    if (shortcutsExpanded) {
+      shortcutsContent.classList.remove('collapsed')
+      shortcutsArrow.textContent = '▼'
+    } else {
+      shortcutsContent.classList.add('collapsed')
+      shortcutsArrow.textContent = '▶'
+    }
   })
 }
 

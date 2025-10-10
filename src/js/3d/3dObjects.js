@@ -1,8 +1,30 @@
 import * as THREE from 'three'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { createCoolerParticles } from './coolerParticles.js'
-import { createRackParticles } from './rackParticles.js'
+import {
+  createCoolerParticles,
+  particleSystems as coolerParticleSystems,
+} from './coolerParticles.js'
+import {
+  createRackParticles,
+  particleSystems as rackParticleSystems,
+} from './rackParticles.js'
+import { addAttractorToRack, attractors } from './attractors.js'
 import { scene, models, raycasterMouse, transformControls } from './scene3d.js'
+
+const loadingManager = new THREE.LoadingManager()
+
+loadingManager.onStart = function () {
+  showLoadingIndicator()
+}
+
+loadingManager.onLoad = function () {
+  hideLoadingIndicator()
+}
+
+loadingManager.onError = function (url) {
+  console.error('Error loading:', url)
+  hideLoadingIndicator()
+}
 
 /**
  * addObjectToScene loads a 3D object (OBJ format) by its model name.
@@ -11,6 +33,12 @@ import { scene, models, raycasterMouse, transformControls } from './scene3d.js'
  */
 export function addObjectToScene(model) {
   console.log(model)
+
+  if (!model) {
+    console.warn('No model specified, skip loading!')
+    return
+  }
+
   // Use a material that responds to light
   let material_obj = new THREE.MeshStandardMaterial({
     color: 0x6e6e6e, // Gray color
@@ -18,33 +46,54 @@ export function addObjectToScene(model) {
     roughness: 0.7, // How rough the surface is (0 = smooth, 1 = rough)
   })
 
-  // let material_obj = new THREE.MeshBasicMaterial( { color: 0x6E6E6E} );
-  const objLoader = new OBJLoader()
-  objLoader.load(`${model}.obj`, function (object) {
-    switch (model) {
-      case 'Chair':
-        aux_mesh_name(object, material_obj, 'chair')
-        object.scale.setScalar(0.05)
-        break
-      case 'Cooler':
-        aux_mesh_name(object, material_obj, 'cooler')
-        object.scale.setScalar(0.01)
-        createCoolerParticles(object)
-        break
-      case 'Table':
-        aux_mesh_name(object, material_obj, 'table')
-        object.scale.setScalar(0.8)
-        break
-      case 'Rack':
-        aux_mesh_name(object, material_obj, 'rack')
-        object.scale.setY(1.1)
-        setRackPosition(object)
-        createRackParticles(object)
-        break
+  const objLoader = new OBJLoader(loadingManager)
+
+  objLoader.load(
+    `${model}.obj`,
+    // onLoad callback
+    function (object) {
+      switch (model) {
+        case 'Chair':
+          aux_mesh_name(object, material_obj, 'chair')
+          object.scale.setScalar(0.05)
+          break
+        case 'Cooler':
+          aux_mesh_name(object, material_obj, 'cooler')
+          object.scale.setScalar(0.01)
+          createCoolerParticles(object)
+          break
+        case 'Table':
+          aux_mesh_name(object, material_obj, 'table')
+          object.scale.setScalar(0.8)
+          break
+        case 'Rack':
+          aux_mesh_name(object, material_obj, 'rack')
+          object.scale.setY(1.1)
+          setRackPosition(object)
+          createRackParticles(object)
+          addAttractorToRack(object)
+          break
+      }
+      scene.add(object)
+      models.push(object)
+      hideLoadingIndicator()
     }
-    scene.add(object)
-    models.push(object)
-  })
+  )
+}
+
+// Helper functions for the loading UI
+function showLoadingIndicator() {
+  const indicator = document.getElementById('loading-indicator')
+  if (indicator) {
+    indicator.style.display = 'flex'
+  }
+}
+
+function hideLoadingIndicator() {
+  const indicator = document.getElementById('loading-indicator')
+  if (indicator) {
+    setTimeout(() => (indicator.style.display = 'none'), 100)
+  }
 }
 
 function setRackPosition(object) {
@@ -68,12 +117,12 @@ function aux_mesh_name(object, material, name) {
  */
 export function deleteObject() {
   const intersects = raycasterMouse.intersectObjects(models, true)
-  console.log(intersects[0].object)
 
   // Check if there are any intersected objects
   if (intersects.length > 0) {
     // Get the parent object that was added to the models array
     let draggableObject = intersects[0].object
+    console.log(draggableObject)
 
     // Traverse up the hierarchy to find the root parent that was added to models
     while (draggableObject.parent && !models.includes(draggableObject)) {
@@ -89,6 +138,36 @@ export function deleteObject() {
       const index = models.indexOf(draggableObject)
       if (index > -1) {
         models.splice(index, 1)
+        console.log('Object removed from models array')
+      }
+
+      // If the object is a cooler, remove also the associated particle system
+      if (draggableObject?.name === 'cooler') {
+        const coolerParticleSystemIndex = coolerParticleSystems.findIndex(
+          (ps) => ps.cooler === draggableObject
+        )
+        if (coolerParticleSystemIndex > -1) {
+          coolerParticleSystems.splice(coolerParticleSystemIndex, 1)
+        }
+      }
+
+      // If the object is a rack, remove also the associated particle system and attractor
+      if (draggableObject?.name === 'rack') {
+        const rackParticleSystemIndex = rackParticleSystems.findIndex(
+          (ps) => ps.rack === draggableObject
+        )
+        if (rackParticleSystemIndex > -1) {
+          rackParticleSystems.splice(rackParticleSystemIndex, 1)
+          console.log('Particle system removed from rackParticleSystems array')
+        }
+
+        const attractorIndex = attractors.findIndex(
+          (a) => a.parent === draggableObject
+        )
+        if (attractorIndex > -1) {
+          attractors.splice(attractorIndex, 1)
+          console.log('Attractor removed from attractors array')
+        }
       }
 
       // Detach transform controls and reset the draggableObject variable

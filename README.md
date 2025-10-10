@@ -83,6 +83,7 @@ live-server docs
 # Development
 
 To format the code before committing:
+
 ```bash
 npm run format
 ```
