@@ -4,6 +4,7 @@ import { createGrid } from './2d/floor2d.js'
 import { setupDxfUpload } from './2d/dxfLoader.js'
 import { init3D, camera, renderer } from './3d/scene3d.js'
 import { convertPathsTo3D } from './3d/pathsTo3d.js'
+import { drawObjectRectangle } from './2d/floor2d.js'
 // import parseDXF from 'dxf-parser'
 
 createGrid()
@@ -23,6 +24,7 @@ switchButton.addEventListener('click', () => {
   } else {
     container2D.style.display = 'block'
     container3D.style.display = 'none'
+    drawObjectRectangle()
     switchButton.textContent = 'Switch to 3D'
   }
 })

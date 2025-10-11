@@ -27,6 +27,10 @@ function convertPathsTo3D() {
 
   // Convert 2D paths to 3D walls
   paper.project.activeLayer.children.forEach((item) => {
+     if (item.data && item.data.isObjectRectangle) {
+       return // Skip this item - it's an object, not a wall
+     }
+
     if (
       item instanceof paper.Path &&
       item.segments.length >= 2 &&

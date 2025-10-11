@@ -147,7 +147,7 @@ function onMouseClick(event) {
   }
 }
 
-function exportSceneToJson() {
+export function exportSceneToJson() {
   let localPosition = new THREE.Vector3(0, 0, 0)
   let box = new THREE.Box3()
   let size = new THREE.Vector3(0, 0, 0)
@@ -175,6 +175,7 @@ function exportSceneToJson() {
   })
 
   console.log(JSON.stringify(sceneData, null, 2)) // Pretty print JSON with 2-space indent
+  return sceneData
 }
 
 // Add event listener for keypress

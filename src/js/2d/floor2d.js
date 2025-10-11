@@ -1,4 +1,5 @@
 import paper from 'paper'
+import { exportSceneToJson } from '../3d/scene3d.js'
 
 const canvas2D = document.getElementById('canvas2D')
 export { canvas2D }
@@ -435,6 +436,75 @@ function undo() {
       redrawDeletedLine(lastAction.data)
       break
   }
+}
+
+function clearObjectRectangles() {
+  const itemsToRemove = []
+
+  paper.project.activeLayer.children.forEach((item) => {
+    if (item.data && item.data.isObjectRectangle) {
+      itemsToRemove.push(item)
+    }
+  })
+
+  itemsToRemove.forEach((item) => item.remove())
+
+  console.log(`Cleared ${itemsToRemove.length} object rectangles`)
+}
+
+export const drawObjectRectangle = () => {
+  clearObjectRectangles()
+
+  const data = exportSceneToJson()
+  if (!data || Object.keys(data).length === 0) {
+    console.log('No objects found in scene data')
+    return
+  }
+  const WORLD_TO_PX = 50
+  Object.entries(data).forEach(([key, objData]) => {
+    if (!objData.coords || !objData.dimensions) {
+      console.log(`Missing coords or dimensions for: ${key}`)
+      return
+    }
+    const { x, z } = objData.coords
+    const canvas2DX = x * WORLD_TO_PX + paper.view.bounds.width / 2
+    const canvas2DY = z * WORLD_TO_PX + paper.view.bounds.height / 2
+    const center = new paper.Point(canvas2DX, canvas2DY)
+    const rect = new paper.Path.Rectangle({
+      point: new paper.Point(center.x - 50 / 2, center.y - 50 / 2),
+      size: [50, 50],
+      fillColor: getColorForObject(key),
+      opacity: 0.5,
+      strokeColor: 'black',
+      strokeWidth: 2,
+    })
+    rect.data = {
+      type: 'object',
+      objectKey: key,
+      isObjectRectangle: true,
+    }
+    const label = new paper.PointText({
+      point: center,
+      content: key.split('_')[0],
+      fillColor: 'white',
+      fontSize: 12,
+      justification: 'center',
+    })
+    label.data = {
+      type: 'objectLabel',
+      parentKey: key,
+      isObjectRectangle: true,
+    }
+  })
+  paper.view.draw()
+}
+
+function getColorForObject(key) {
+  if (key.startsWith('table')) return 'brown'
+  if (key.startsWith('chair')) return 'blue'
+  if (key.startsWith('cooler')) return 'cyan'
+  if (key.startsWith('rack')) return 'gray'
+  return 'black'
 }
 
 document.addEventListener('keydown', function (event) {
