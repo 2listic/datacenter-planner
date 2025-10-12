@@ -1,5 +1,6 @@
 import paper from 'paper'
-import { ensureGridVisible } from './floor2d.js'
+import { ensureGridVisible } from './core2d.js'
+import { clearCanvas } from './drawing2d.js'
 
 /**
  * loadDxfFile loads and parses a DXF file, scales its entities to fit the canvas,
@@ -28,8 +29,9 @@ export function loadDxfFile(file) {
         console.log('Scale factor:', scale)
         console.log('Offset:', offset)
 
-        // Clear existing content
-        paper.project.clear()
+        // Clear existing content but preserve the grid
+        // Use the clearCanvas helper which removes user drawings but keeps the grid group
+        clearCanvas()
         dxfCircles.length = 0 // Clear previous circles
 
         // Process entities with scaling and positioning
