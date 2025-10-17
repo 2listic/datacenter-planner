@@ -9,6 +9,8 @@ export let particleSystems = []
 // along z on the plane parrallel to the floor is constant
 const accelerations = [0.5, 1.5, 1]
 
+let frameCount = 0
+
 /**
  * createCoolerParticles creates and attaches a particle system to a cooler object.
  *
@@ -16,7 +18,7 @@ const accelerations = [0.5, 1.5, 1]
  * @returns {void}
  */
 export function createCoolerParticles(coolerObject) {
-  const particleCount = 500
+  const particleCount = 200
   const particlesGeometry = new THREE.BufferGeometry()
   const positions = new Float32Array(particleCount * 3)
   const worldPositions = new Float32Array(particleCount * 3)
@@ -83,6 +85,9 @@ export function createCoolerParticles(coolerObject) {
  * @returns {void}
  */
 export function updateCoolerParticles() {
+  frameCount++
+  const doRaycast = frameCount % 5 === 0 // Raycast every 5 frames
+
   particleSystems.forEach((particleData) => {
     const geometry = particleData.geometry
     const positions = geometry.attributes.position.array
@@ -115,19 +120,19 @@ export function updateCoolerParticles() {
       positions[i + 1] += velocities[i + 1] * accelerations[1]
       positions[i + 2] += velocities[i + 2] * accelerations[2]
 
-      // Add some turbulence
-      velocities[i] += (Math.random() - 0.5) * 0.001
-      velocities[i + 1] += (Math.random() - 0.5) * 0.01
-      velocities[i + 2] += (Math.random() - 0.5) * 0.02 // it expands along z-axis orthogonal to main direction x
+      // Add some turbulence (reduced frequency)
+      if (doRaycast) {
+        velocities[i] += (Math.random() - 0.5) * 0.001
+        velocities[i + 1] += (Math.random() - 0.5) * 0.01
+        velocities[i + 2] += (Math.random() - 0.5) * 0.02
+      }
 
-      // Check for collisions
+      // Convert particle position from local cooler space to world space
       const particlePosition = new THREE.Vector3(
         positions[i],
         positions[i + 1],
         positions[i + 2]
       )
-
-      // Convert particle position from local cooler space to world space
       const worldPosition = particlePosition.clone()
       particleData.cooler.localToWorld(worldPosition)
 
@@ -136,43 +141,46 @@ export function updateCoolerParticles() {
       worldPositions[i + 1] = worldPosition['y']
       worldPositions[i + 2] = worldPosition['z']
 
-      // Set up raycaster from particle position
-      const rayDirection = new THREE.Vector3(
-        velocities[i],
-        velocities[i + 1],
-        velocities[i + 2]
-      ).normalize()
+      if (doRaycast) {
+        // Check for collisions
+        // Set up raycaster from particle position
+        const rayDirection = new THREE.Vector3(
+          velocities[i],
+          velocities[i + 1],
+          velocities[i + 2]
+        ).normalize()
 
-      raycasterCollision.set(worldPosition, rayDirection)
+        raycasterCollision.set(worldPosition, rayDirection)
 
-      // Get all objects except the cooler itself
-      const filteredObjects = models.filter(
-        (obj) => obj !== particleData.cooler
-      )
-      // Take only the object itself without its particles if present
-      const filteredObjectsMeshes = filteredObjects.map((obj) =>
-        obj.getObjectByProperty('type', 'Mesh')
-      )
-      const objectsToTest = [...filteredObjectsMeshes, floor, ...walls]
+        // Get all objects except the cooler itself
+        const filteredObjects = models.filter(
+          (obj) => obj !== particleData.cooler
+        )
+        // Take only the object itself without its particles if present
+        const filteredObjectsMeshes = filteredObjects.map((obj) =>
+          obj.getObjectByProperty('type', 'Mesh')
+        )
+        const objectsToTest = [...filteredObjectsMeshes, floor, ...walls]
 
-      const intersects = raycasterCollision.intersectObjects(
-        objectsToTest,
-        false // do not check descendants
-      )
+        const intersects = raycasterCollision.intersectObjects(
+          objectsToTest,
+          false // do not check descendants
+        )
 
-      // Check if collision is close enough (within particle size)
-      if (intersects.length > 0 && intersects[0].distance < 0.1) {
-        // Change particle color on collision
-        colors[i] = 1.0 // Red
-        colors[i + 1] = 0.5 // Orange-ish
-        colors[i + 2] = 0.0 // Blue = 0
+        // Check if collision is close enough (within particle size)
+        if (intersects.length > 0 && intersects[0].distance < 0.1) {
+          // Change particle color on collision
+          colors[i] = 1.0 // Red
+          colors[i + 1] = 0.5 // Orange-ish
+          colors[i + 2] = 0.0 // Blue = 0
 
-        // Stop the particle completely on wall collision
-        velocities[i] = 0
-        velocities[i + 1] = 0
-        velocities[i + 2] = 0
+          // Stop the particle completely on wall collision
+          velocities[i] = 0
+          velocities[i + 1] = 0
+          velocities[i + 2] = 0
 
-        maxLifetime[particleIndex] *= 0.9 // Reduce maxLifetime to avoid accumulation
+          maxLifetime[particleIndex] *= 0.9 // Reduce maxLifetime to avoid accumulation
+        }
       }
     }
 
